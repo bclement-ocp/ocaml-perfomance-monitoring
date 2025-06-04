@@ -30,3 +30,5 @@ let () =
     ~pkgs:Total_trace.pkgs
     ~log:Sys.argv.(1)
     ~status_file:Sys.argv.(2)
+    ~ocamlparam:[]
+    ~opamjobs:"1"

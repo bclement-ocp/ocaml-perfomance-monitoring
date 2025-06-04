@@ -114,3 +114,5 @@ let () = Runner.run
  ~context:[]
  ~pkgs:hard
  ~status_file:"cases/occur_rec/status/run4"
+ ~ocamlparam:[]
+ ~opamjobs:"1"

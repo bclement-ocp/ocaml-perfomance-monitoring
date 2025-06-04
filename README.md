@@ -97,6 +97,8 @@ The JSON configuration file supports the following fields:
 - `retry`: Number of retry attempts for failed operations (default: 3)
 - `with_filesize`: Whether to collect file size information (default: false)
 - `with_test`: Whether to install packages with tests using `-t` flag (default: false)
+- `ocamlparam`: Object with additional OCAMLPARAM key-value pairs (default: empty)
+- `opamjobs`: String value for OPAMJOBS environment variable (default: "1")
 - `switches`: List of OCaml switch names to benchmark
 - `context`: List of packages to install as context (dependencies, default: empty list)
 - `pkgs`: List of packages to benchmark

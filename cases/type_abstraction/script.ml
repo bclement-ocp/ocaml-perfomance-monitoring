@@ -24,3 +24,5 @@ let () = Runner.run
  ~context:[]
  ~pkgs:simple
  ~status_file:"ta.json"
+ ~ocamlparam:[]
+ ~opamjobs:"1"

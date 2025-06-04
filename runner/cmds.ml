@@ -33,9 +33,11 @@ let opam_var ~switch ~pkg var =
   r
 
 
-let execute ~retry ~dir ~switch ~pkg =
-  putenv_fmt "OCAMLPARAM" ",_,timings=1,dump-into-file=1,dump-dir=%s" dir;
-  putenv_fmt "OPAMJOBS" "1";
+let execute ~retry ~dir ~switch ~pkg ~ocamlparam ~opamjobs =
+  let ocamlparam_str = String.concat "," (List.map (fun (k, v) -> k ^ "=" ^ v) ocamlparam) in
+  let full_ocamlparam = ",_,timings=1,dump-into-file=1,dump-dir=" ^ dir ^ (if ocamlparam_str = "" then "" else "," ^ ocamlparam_str) in
+  putenv_fmt "OCAMLPARAM" "%s" full_ocamlparam;
+  putenv_fmt "OPAMJOBS" "%s" opamjobs;
   reinstall ~retry ~switch ~pkg
 
 

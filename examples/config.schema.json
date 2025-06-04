@@ -42,6 +42,19 @@
       "default": false,
       "description": "Whether to install packages with tests using -t flag (default: false)"
     },
+    "ocamlparam": {
+      "type": "object",
+      "default": {},
+      "description": "Additional OCAMLPARAM key-value pairs (default: empty object)",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "opamjobs": {
+      "type": "string",
+      "default": "1",
+      "description": "OPAMJOBS value for controlling parallel builds (default: '1')"
+    },
     "switches": {
       "type": "array",
       "items": {

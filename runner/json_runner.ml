@@ -16,6 +16,8 @@ type config = {
   context : package_spec list;
   pkgs : package_spec list;
   status_file : string;
+  ocamlparam : (string * string) list;
+  opamjobs : string;
 }
 
 let package_spec_of_yojson = function
@@ -48,6 +50,17 @@ let string_list_of_yojson = function
     aux [] items
   | _ -> Error "Expected list"
 
+let ocamlparam_of_yojson = function
+  | `Assoc assoc ->
+    let rec aux acc = function
+      | [] -> Ok (List.rev acc)
+      | (key, `String value) :: rest -> aux ((key, value) :: acc) rest
+      | (key, _) :: _ -> Error ("Expected string value for key: " ^ key)
+    in
+    aux [] assoc
+  | `Null -> Ok []
+  | _ -> Error "Expected object for ocamlparam"
+
 let config_of_yojson json =
   let open Yojson.Safe.Util in
   try
@@ -79,7 +92,13 @@ let config_of_yojson json =
       | Error e -> failwith e
     in
     let status_file = json |> member "status_file" |> to_string in
-    Ok {log; n; slices; retry; with_filesize; with_test; switches; context; pkgs; status_file}
+    let ocamlparam_json = json |> member "ocamlparam" in
+    let ocamlparam = match ocamlparam_of_yojson ocamlparam_json with
+      | Ok o -> o
+      | Error e -> failwith e
+    in
+    let opamjobs = json |> member "opamjobs" |> to_string_option |> Option.value ~default:"1" in
+    Ok {log; n; slices; retry; with_filesize; with_test; switches; context; pkgs; status_file; ocamlparam; opamjobs}
   with
   | exn -> Error (Printexc.to_string exn)
 
@@ -107,6 +126,8 @@ let run_from_config config =
     ~context:context_pkgs
     ~pkgs:pkgs_tuples
     ~status_file:config.status_file
+    ~ocamlparam:config.ocamlparam
+    ~opamjobs:config.opamjobs
 
 let print_example_config () =
   let example = {|{
@@ -126,7 +147,12 @@ Optional fields with defaults:
   "retry": 3,       // Retry attempts (default: 3)
   "with_filesize": false,  // Collect file sizes (default: false)
   "with_test": false,      // Install with tests using -t flag (default: false)
-  "context": []     // Context packages (default: empty list)
+  "context": [],    // Context packages (default: empty list)
+  "ocamlparam": {   // Additional OCAMLPARAM key-value pairs (default: empty)
+    "compact": "1",
+    "debug": "0"
+  },
+  "opamjobs": "1"   // OPAMJOBS value (default: "1")
 |} in
   print_endline "Example configuration:";
   print_endline example
@@ -154,4 +180,6 @@ let () =
     printf "Samples: %d\n" config.n;
     printf "Switches: %s\n" (String.concat ", " config.switches);
     printf "Packages: %d\n" (List.length config.pkgs);
+    printf "OCAMLPARAM: %s\n" (String.concat "," (List.map (fun (k,v) -> k ^ "=" ^ v) config.ocamlparam));
+    printf "OPAMJOBS: %s\n" config.opamjobs;
     run_from_config config
