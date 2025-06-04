@@ -68,7 +68,10 @@ def clone_opam_repository(repo_dir):
         run_command(["git", "clone", "--branch", "with-extensions", repo_url, str(repo_dir)])
 
 
-def create_variant_package(repo_dir, variant_name, commit_hash, checksum=None):
+def create_variant_package(
+    repo_dir, variant_name, commit_hash,
+    user="ocaml-flambda", repo="flambda-backend", checksum=None
+):
     """Create a new variant package from the template."""
     packages_dir = repo_dir / "packages" / "ocaml-variants"
     template_dir = packages_dir / "ocaml-variants.5.2.0+flambda2-82e4553f"
@@ -92,7 +95,7 @@ def create_variant_package(repo_dir, variant_name, commit_hash, checksum=None):
     opam_file = variant_dir / "opam"
 
     # Generate URL and calculate checksum if not provided
-    url = f"https://github.com/ocaml-flambda/flambda-backend/archive/{commit_hash}.tar.gz"
+    url = f"https://github.com/{user}/{repo}/archive/{commit_hash}.tar.gz"
 
     if checksum is None:
         print("No checksum provided, calculating...")
@@ -203,6 +206,18 @@ Examples:
     )
 
     parser.add_argument(
+        "--user",
+        default="ocaml-flambda",
+        help="Name of the GitHub user to take the commit from"
+    )
+
+    parser.add_argument(
+        "--repo",
+        default="flambda-backend",
+        help="Name of the GitHub repository to take the commit from"
+    )
+
+    parser.add_argument(
         "--skip-clone",
         action="store_true",
         help="Skip cloning/updating the repository (assume it already exists)"
@@ -226,7 +241,10 @@ Examples:
                 sys.exit(1)
 
         # Step 2: Create variant package
-        success = create_variant_package(args.repo_dir, args.name, args.commit, args.checksum)
+        success = create_variant_package(
+            args.repo_dir, args.name, args.commit,
+            user=args.user, repo=args.repo, checksum=args.checksum
+        )
         if not success:
             sys.exit(1)
 
