@@ -14,11 +14,12 @@ let rec with_retry ~msg ~retry f =
     Fmt.(pf stderr) "Error during %t. Retrying %d times.@." msg retry;
     with_retry ~msg ~retry:(retry - 1) f
 
-let reinstall ~retry ~switch ~pkg =
+let reinstall ~retry ~switch ~pkg ~with_test =
+  let test_flag = if with_test then "-t" else "" in
   with_retry
     ~msg:(Format.dprintf "reinstallation of %s"  (Pkg.full pkg))
     ~retry
-    (fun () -> with_switch ~switch "opam reinstall --no-depexts -b --yes %s" (Pkg.name pkg))
+    (fun () -> with_switch ~switch "opam reinstall --no-depexts -b --yes %s %s" test_flag (Pkg.name pkg))
 
 let install ~retry ~with_test ~switch ~pkgs =
   let test_flag = if with_test then "-t" else "" in
@@ -33,12 +34,12 @@ let opam_var ~switch ~pkg var =
   r
 
 
-let execute ~retry ~dir ~switch ~pkg ~ocamlparam ~opamjobs =
+let execute ~retry ~dir ~switch ~pkg ~ocamlparam ~opamjobs ~with_test =
   let ocamlparam_str = String.concat "," (List.map (fun (k, v) -> k ^ "=" ^ v) ocamlparam) in
   let full_ocamlparam = ",_,timings=1,dump-into-file=1,dump-dir=" ^ dir ^ (if ocamlparam_str = "" then "" else "," ^ ocamlparam_str) in
   putenv_fmt "OCAMLPARAM" "%s" full_ocamlparam;
   putenv_fmt "OPAMJOBS" "%s" opamjobs;
-  reinstall ~retry ~switch ~pkg
+  reinstall ~retry ~switch ~pkg ~with_test
 
 
 

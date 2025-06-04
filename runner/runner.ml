@@ -83,10 +83,10 @@ let rec rmr f =
   else Sys.remove f
 
 
-let sample ~retry ~log ~slices ~with_filesize ~switch ~pkg ~ocamlparam ~opamjobs =
+let sample ~retry ~log ~slices ~with_filesize ~with_test ~switch ~pkg ~ocamlparam ~opamjobs =
   let dir = pkg_dir ~switch ~pkg in
   let () =  Sys.mkdir dir 0o777 in
-  Cmds.execute ~retry ~switch ~pkg ~dir ~ocamlparam ~opamjobs <!> Format.dprintf "Failed to install %s" (Pkg.full pkg);
+  Cmds.execute ~with_test ~retry ~switch ~pkg ~dir ~ocamlparam ~opamjobs <!> Format.dprintf "Failed to install %s" (Pkg.full pkg);
   let build_dir = Cmds.opam_var ~switch ~pkg "build" in
   Seq.iter
     (Log.write_entry log)
@@ -94,17 +94,17 @@ let sample ~retry ~log ~slices ~with_filesize ~switch ~pkg ~ocamlparam ~opamjobs
   rmr dir
 
 
-let rec multisample n ~with_filesize ~retry ~log ~slices ~switch ~pkg ~ocamlparam ~opamjobs =
+let rec multisample n ~with_filesize ~with_test ~retry ~log ~slices ~switch ~pkg ~ocamlparam ~opamjobs =
   if n = 0 then () else
     begin
-      sample ~with_filesize ~retry ~log ~switch ~pkg ~slices ~ocamlparam ~opamjobs;
-      multisample ~with_filesize ~retry (n-1) ~slices ~log  ~pkg ~switch ~ocamlparam ~opamjobs
+      sample ~with_filesize ~with_test ~retry ~log ~switch ~pkg ~slices ~ocamlparam ~opamjobs;
+      multisample ~with_filesize ~with_test ~retry (n-1) ~slices ~log  ~pkg ~switch ~ocamlparam ~opamjobs
     end
 
-let pkg_line n ~with_filesize ~retry ~log ~slices ~switch pkgs ~ocamlparam ~opamjobs =
+let pkg_line n ~with_filesize ~with_test ~retry ~log ~slices ~switch pkgs ~ocamlparam ~opamjobs =
   Cmds.remove_pkg ~switch (List.rev pkgs);
   List.iter  (fun pkg ->
-      multisample ~with_filesize n ~retry ~slices ~log ~switch ~pkg ~ocamlparam ~opamjobs
+      multisample ~with_filesize ~with_test n ~retry ~slices ~log ~switch ~pkg ~ocamlparam ~opamjobs
     ) pkgs
 
 
@@ -126,9 +126,9 @@ let experiment ~retry ~log ~slices ~ocamlparam ~opamjobs {Zipper.switch;pkg;_} =
 
 let start ~n ~retry ~slices ~with_filesize ~with_test ~switches ~status_file ~log_name ~log ~context ~pkgs ~ocamlparam ~opamjobs =
   let () = clean ~switches ~pkgs () in
-  let () = install_context ~retry:3 ~with_test ~switches ~pkgs:context in
+  let () = install_context ~retry:3 ~with_test:false ~switches ~pkgs:context in
   let z = Zipper.start ~with_filesize ~slices ~retry ~log:log_name ~switches ~pkgs ~sample_size:n in
-  Zipper.tracked_iter ~status_file (experiment ~with_filesize ~slices ~retry ~log ~ocamlparam ~opamjobs) z
+  Zipper.tracked_iter ~status_file (experiment ~with_filesize ~with_test ~slices ~retry ~log ~ocamlparam ~opamjobs) z
 
 
 
@@ -153,7 +153,7 @@ let restart ~status_file  =
   let () = install_context ~retry:3 ~with_test:false ~switches ~pkgs:sampled in
   with_file_append z.log (fun log ->
       Zipper.tracked_iter ~status_file
-        (experiment ~with_filesize ~slices ~retry:z.retry ~log ~ocamlparam:[] ~opamjobs:"1") z
+        (experiment ~with_filesize ~with_test:false ~slices ~retry:z.retry ~log ~ocamlparam:[] ~opamjobs:"1") z
     )
 
 
