@@ -46,6 +46,13 @@ let scan_entry s =
   let s = String.trim s in
   let segments = String.split_on_char ' ' s in
   let segments = List.filter (function "" -> false | _ -> true) segments in
+  (* HACK for "check zero_alloc" (with a space) *)
+  let segments =
+    match segments with
+    | [t; one; two] -> [t; one ^ " " ^ two]
+    | [t; a; b; c; one; two] -> [t; a; b; c; one ^ " " ^ two]
+    | segments -> segments
+  in
   match segments with
   | [t; name] | [t;_;_;_;name] ->
     let time =

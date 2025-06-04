@@ -18,6 +18,7 @@ let () = Runner.run
  ~slices:["typing"]
  ~n:4
  ~with_filesize:false
+ ~with_test:false
  ~retry:3
  ~switches:[before;after]
  ~context:[]

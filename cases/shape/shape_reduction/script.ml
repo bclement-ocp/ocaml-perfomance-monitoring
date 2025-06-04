@@ -25,6 +25,7 @@ let () =
     ~slices:["typing"]
     ~switches:Alts.all
     ~with_filesize:true
+    ~with_test:false
     ~context:(List.map (fun (x,y) -> Pkg.make x y) Total_trace.context)
     ~pkgs:Total_trace.pkgs
     ~log:Sys.argv.(1)

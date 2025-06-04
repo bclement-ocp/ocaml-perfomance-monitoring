@@ -1,0 +1,11 @@
+{
+  "log": "logs/simple_benchmark.log",
+  "slices": ["typing"],
+  "switches": ["5.2.0+trunk", "5.2.0+my-variant"],
+  "pkgs": [
+    {"name": "ocamlfind", "version": "1.9.1"},
+    {"name": "num", "version": "1.4"},
+    {"name": "zarith", "version": "1.12"}
+  ],
+  "status_file": "status/simple_run.json"
+}

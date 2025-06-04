@@ -109,6 +109,7 @@ let () = Runner.run
  ~slices:["typing"; "occur_rec"]
  ~retry:3
  ~with_filesize:false
+ ~with_test:false
  ~switches:[before;after]
  ~context:[]
  ~pkgs:hard

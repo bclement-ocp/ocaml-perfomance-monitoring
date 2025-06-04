@@ -1,10 +1,14 @@
-all:  runner analyzer
+all:  runner json-runner analyzer
 .PHONY: all
 
 
 .PHONY: runner
 runner:
 	dune build ./runner/runner.exe
+
+.PHONY: json-runner
+json-runner:
+	dune build ./runner/json_runner.exe
 
 .PHONY: analyzer
 analyzer:

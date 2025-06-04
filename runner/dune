@@ -1,5 +1,12 @@
 (library
  (name runner)
- (libraries unix fmt lib yojson)
+ (libraries unix fmt lib)
  (preprocess (pps ppx_yojson_conv))
+ (modules runner zipper cmds)
+)
+
+(executable
+ (name json_runner)
+ (modules json_runner)
+ (libraries runner yojson)
 )

@@ -20,10 +20,11 @@ let reinstall ~retry ~switch ~pkg =
     ~retry
     (fun () -> with_switch ~switch "opam reinstall --no-depexts -b --yes %s" (Pkg.name pkg))
 
-let install ~retry  ~switch ~pkgs =
+let install ~retry ~with_test ~switch ~pkgs =
+  let test_flag = if with_test then "-t" else "" in
   with_retry ~retry
     ~msg:(Format.dprintf "reinstallation of %a"  (Fmt.(list string))  (List.map Pkg.full pkgs))
-    (fun () -> with_switch ~switch "opam install --no-depexts -b --yes %s" (String.concat " " @@ List.map Pkg.name pkgs))
+    (fun () -> with_switch ~switch "opam install --no-depexts -b --yes %s %s" test_flag (String.concat " " @@ List.map Pkg.name pkgs))
 
 let opam_var ~switch ~pkg var =
   let inp, out = Unix.open_process (Format.asprintf "(%t && opam var %s:%s)" (set_switch switch) (Pkg.name pkg) var) in
@@ -33,7 +34,7 @@ let opam_var ~switch ~pkg var =
 
 
 let execute ~retry ~dir ~switch ~pkg =
-  putenv_fmt "OCAMLPARAM" ",_,timings=1,dump-dir=%s" dir;
+  putenv_fmt "OCAMLPARAM" ",_,timings=1,dump-into-file=1,dump-dir=%s" dir;
   putenv_fmt "OPAMJOBS" "1";
   reinstall ~retry ~switch ~pkg
 

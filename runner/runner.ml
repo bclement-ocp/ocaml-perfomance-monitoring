@@ -112,21 +112,21 @@ let clean ~switches ~pkgs () = List.iter (fun switch ->
      Cmds.remove_pkg ~switch (List.rev pkgs)
   ) switches
 
-let install_context ~retry ~switches ~pkgs =
+let install_context ~retry ~with_test ~switches ~pkgs =
   match pkgs with
   | [] -> ()
   | _ ->
     List.iter (fun switch ->
-        Cmds.install ~retry ~switch ~pkgs
+        Cmds.install ~retry ~with_test ~switch ~pkgs
         <!> Format.dprintf "Installation failure: %s/%a" switch Fmt.(list string) (List.map Pkg.full pkgs)
       ) switches
 
 let experiment ~retry ~log ~slices {Zipper.switch;pkg;_} =
   sample ~retry ~log ~switch ~slices ~pkg
 
-let start ~n ~retry ~slices ~with_filesize ~switches ~status_file ~log_name ~log ~context ~pkgs =
+let start ~n ~retry ~slices ~with_filesize ~with_test ~switches ~status_file ~log_name ~log ~context ~pkgs =
   let () = clean ~switches ~pkgs () in
-  let () = install_context ~retry:3  ~switches ~pkgs:context in
+  let () = install_context ~retry:3 ~with_test ~switches ~pkgs:context in
   let z = Zipper.start ~with_filesize ~slices ~retry ~log:log_name ~switches ~pkgs ~sample_size:n in
   Zipper.tracked_iter ~status_file (experiment ~with_filesize ~slices ~retry ~log) z
 
@@ -150,7 +150,7 @@ let restart ~status_file  =
   let sampled = z.pkgs.sampled in
   let todo = z.pkgs.todo in
   let () = clean ~switches ~pkgs:todo () in
-  let () = install_context ~retry:3 ~switches ~pkgs:sampled in
+  let () = install_context ~retry:3 ~with_test:false ~switches ~pkgs:sampled in
   with_file_append z.log (fun log ->
       Zipper.tracked_iter ~status_file
         (experiment ~with_filesize ~slices ~retry:z.retry ~log) z
@@ -158,11 +158,12 @@ let restart ~status_file  =
 
 
 
-let run ~n ~with_filesize ~slices ~retry ~status_file ~log:log_name ~switches ~context ~pkgs =
+let run ~n ~with_filesize ~slices ~retry ~with_test ~status_file ~log:log_name ~switches ~context ~pkgs =
   with_file log_name (fun log ->
       start ~slices ~log ~log_name ~status_file
         ~n
         ~with_filesize
+        ~with_test
         ~retry
         ~switches
         ~context

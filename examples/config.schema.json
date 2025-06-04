@@ -1,0 +1,94 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "OCaml Performance Monitoring Configuration",
+  "description": "Configuration for running OCaml compilation benchmarks",
+  "type": "object",
+  "required": ["log", "slices", "switches", "pkgs", "status_file"],
+  "properties": {
+    "log": {
+      "type": "string",
+      "description": "Path where benchmark logs will be written",
+      "examples": ["logs/benchmark.log", "cases/occur_rec/logs/log4"]
+    },
+    "n": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 1,
+      "description": "Number of samples to collect per package (default: 1)",
+      "examples": [10, 100]
+    },
+    "slices": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of compilation phases to profile",
+      "examples": [["typing"], ["typing", "occur_rec"]]
+    },
+    "retry": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 3,
+      "description": "Number of retry attempts for failed operations (default: 3)",
+      "examples": [3, 5]
+    },
+    "with_filesize": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether to collect file size information (default: false)"
+    },
+    "with_test": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether to install packages with tests using -t flag (default: false)"
+    },
+    "switches": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "description": "List of OCaml switch names to benchmark",
+      "examples": [["5.2.0+trunk", "5.2.0+my-variant"]]
+    },
+    "context": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/package"
+      },
+      "default": [],
+      "description": "List of packages to install as context (dependencies, default: empty list)"
+    },
+    "pkgs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/package"
+      },
+      "minItems": 1,
+      "description": "List of packages to benchmark"
+    },
+    "status_file": {
+      "type": "string",
+      "description": "Path to store benchmark progress/status",
+      "examples": ["status/run.json", "cases/occur_rec/status/run4"]
+    }
+  },
+  "definitions": {
+    "package": {
+      "type": "object",
+      "required": ["name", "version"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Package name"
+        },
+        "version": {
+          "type": "string",
+          "description": "Package version"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
