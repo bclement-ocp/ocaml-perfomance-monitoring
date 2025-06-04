@@ -4,6 +4,10 @@ profiles of OCaml programs.
 The main objective is to harvest data and knowledge about the performance of the OCaml compiler
 in the opam ecosystem and track the effect of various PRs on the OCaml compiler performance.
 
+**WARNING**: You must disable opam's build sandboxing (remove the
+`wrap-build-commands` entry in `.opam/config`) in order for the compiler to be
+able to store the timings file in a temporary directory.
+
 # How to create an flambda2 switch
 
 ## Automated approach (recommended)
@@ -28,6 +32,10 @@ The script will:
 4. Optionally create the opam switch (if `--create-switch` is provided)
 
 Run `python3 create_flambda2_switch.py --help` for all available options.
+
+Note: in certain situations, actually creating the switch might fail because new
+patches are needed or old patches no longer apply. In this case, you must fall
+back to the manual approach and figure it out. Good luck!
 
 ## Manual approach
 
