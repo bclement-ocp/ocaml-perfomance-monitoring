@@ -1,4 +1,5 @@
-let output_dir name = "/tmp/" ^ name
+let output_dir name =
+  Filename.concat (Filename.get_temp_dir_name ()) name
 
 let uuid name =
   let rec loop n =
