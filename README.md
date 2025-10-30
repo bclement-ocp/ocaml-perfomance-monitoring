@@ -41,8 +41,7 @@ back to the manual approach and figure it out. Good luck!
 
 If you prefer to do it manually:
 
-1. Clone https://github.com/bclement-ocp/opam-repository-flambda somewhere and
-   go to branch `with-extensions`.
+1. Clone https://github.com/oxcaml/opam-repository somewhere.
 
 2. Create a switch configuration with the branch that you're interested in by
    copying the template (replace "NAME" with the name you want for your
@@ -50,7 +49,7 @@ If you prefer to do it manually:
 
    ```console
    $ cd packages/ocaml-variants/
-   $ cp -r ocaml-variants.5.2.0+{flambda2-82e4553f,NAME}
+   $ cp -r ocaml-variants.5.2.0+{ox,NAME}
    ```
 
 3. Edit the opam file in `ocaml-variants.5.2.0+NAME/opam`. You need to change

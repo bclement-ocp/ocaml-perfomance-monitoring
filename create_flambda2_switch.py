@@ -55,17 +55,17 @@ def calculate_sha256(url):
 
 def clone_opam_repository(repo_dir):
     """Clone the opam-repository-flambda repository."""
-    repo_url = "https://github.com/bclement-ocp/opam-repository-flambda"
+    repo_url = "https://github.com/oxcaml/opam-repository"
 
     if repo_dir.exists():
         print(f"Repository already exists at {repo_dir}")
         # Update existing repository
         run_command(["git", "fetch"], cwd=repo_dir)
-        run_command(["git", "checkout", "with-extensions"], cwd=repo_dir)
+        run_command(["git", "checkout", "main"], cwd=repo_dir)
         run_command(["git", "pull"], cwd=repo_dir)
     else:
         print(f"Cloning repository to {repo_dir}")
-        run_command(["git", "clone", "--branch", "with-extensions", repo_url, str(repo_dir)])
+        run_command(["git", "clone", "--branch", "main", repo_url, str(repo_dir)])
 
 
 def create_variant_package(
@@ -74,7 +74,7 @@ def create_variant_package(
 ):
     """Create a new variant package from the template."""
     packages_dir = repo_dir / "packages" / "ocaml-variants"
-    template_dir = packages_dir / "ocaml-variants.5.2.0+flambda2-82e4553f"
+    template_dir = packages_dir / "ocaml-variants.5.2.0+ox"
     variant_dir = packages_dir / f"ocaml-variants.5.2.0+{variant_name}"
 
     if not template_dir.exists():
@@ -135,10 +135,10 @@ def create_opam_switch(repo_dir, variant_name):
     switch_name = f"5.2.0+{variant_name}"
 
     print("Updating opam repositories...")
-    run_command(["opam", "update", "with-extensions"], check=False)  # This might fail first time
+    run_command(["opam", "update", "oxcaml"], check=False)  # This might fail first time
 
     print(f"Creating opam switch: {switch_name}")
-    repos_arg = f"with-extensions={repo_dir},default"
+    repos_arg = f"oxcaml={repo_dir},default"
 
     # Check if switch already exists
     result = run_command(["opam", "switch", "list", "--short"], capture_output=True)
