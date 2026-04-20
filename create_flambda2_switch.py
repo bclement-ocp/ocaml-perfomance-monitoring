@@ -70,7 +70,7 @@ def clone_opam_repository(repo_dir):
 
 def create_variant_package(
     repo_dir, variant_name, commit_hash,
-    user="ocaml-flambda", repo="flambda-backend", checksum=None
+    user="oxcaml", repo="oxcaml", checksum=None
 ):
     """Create a new variant package from the template."""
     packages_dir = repo_dir / "packages" / "ocaml-variants"
@@ -114,8 +114,8 @@ def create_variant_package(
         content = f.read()
 
     # Replace the specific URL and checksum strings from the template
-    template_url = "https://github.com/ocaml-flambda/flambda-backend/archive/82e4553f8d75eb4e6f8e94cd9bf90369968f64d5.tar.gz"
-    template_checksum = "sha256=c390e80899a92df4b39685987247b202bb0ce992084bd5c6139f1a029f39d43d"
+    template_url = "https://github.com/oxcaml/oxcaml/archive/refs/tags/5.2.0minus-25.tar.gz"
+    template_checksum = "sha256=08e9cdc1b4e919cb3266eab8b4cd98f74ffc580a6b21b7d09b156278aa2876fc"
 
     # Replace URL
     content = content.replace(template_url, url)
@@ -190,7 +190,7 @@ Examples:
     parser.add_argument(
         "--commit",
         required=True,
-        help="Git commit hash from flambda-backend repository"
+        help="Git commit hash from oxcaml repository"
     )
 
     parser.add_argument(
@@ -207,13 +207,13 @@ Examples:
 
     parser.add_argument(
         "--user",
-        default="ocaml-flambda",
+        default="oxcaml",
         help="Name of the GitHub user to take the commit from"
     )
 
     parser.add_argument(
         "--repo",
-        default="flambda-backend",
+        default="oxcaml",
         help="Name of the GitHub repository to take the commit from"
     )
 
